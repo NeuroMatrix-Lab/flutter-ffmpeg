@@ -1,4 +1,4 @@
-name: Build Flutter App
+name: Build Flutter App (Windows)
 
 on:
   push:
@@ -8,14 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+  build-windows:
+    runs-on: windows-latest
     
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -28,35 +23,20 @@ jobs:
           cache: true
           
       - name: Setup FFmpeg
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update
-            sudo apt-get install -y ffmpeg
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install ffmpeg
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            choco install ffmpeg -y
-          fi
-          
+        run: choco install ffmpeg -y
+        
       - name: Get dependencies
         run: flutter pub get
         
       - name: Analyze code
         run: flutter analyze --no-fatal-infos --no-fatal-warnings
         
-      - name: Build ${{ matrix.os }}
-        run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            flutter build linux --release
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            flutter build macos --release
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            flutter build windows --release
-          fi
-          
+      - name: Build Windows
+        run: flutter build windows --release
+        
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-app-${{ matrix.os }}
-          path: build/
+          name: flutter-app-windows
+          path: build/windows/x64/release/
           retention-days: 7
