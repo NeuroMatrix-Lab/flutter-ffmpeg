@@ -2,7 +2,7 @@ name: Build Flutter App
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, rust, dev, feature/* ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
