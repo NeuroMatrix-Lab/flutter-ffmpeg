@@ -1,4 +1,4 @@
-name: Build Flutter App (Windows)
+name: Build Flutter App
 
 on:
   push:
@@ -48,9 +48,57 @@ jobs:
           Copy-Item "$env:TEMP\ffmpeg\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe" "build\windows\x64\runner\Release\resources\windows\ffmpeg.exe"
           Write-Host "FFmpeg copied to resources"
         
-      - name: Upload artifacts
+      - name: Upload Windows artifacts
         uses: actions/upload-artifact@v4
         with:
           name: flutter-app-windows
           path: build/windows/x64/runner/Release/
+          retention-days: 7
+
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+          channel: 'stable'
+          cache: true
+          
+      - name: Get dependencies
+        run: flutter pub get
+        
+      - name: Analyze code
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+        
+      - name: Build macOS
+        run: flutter build macos --release
+        
+      - name: Download FFmpeg for macOS
+        run: |
+          # 安装 homebrew 如果需要
+          if ! command -v brew &> /dev/null; then
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          fi
+          
+          # 安装 ffmpeg
+          brew install ffmpeg
+          
+          # 创建 macOS 资源的临时目录
+          mkdir -p build/macos/Build/Products/Release/resources/macos
+          
+          # 复制 ffmpeg
+          cp $(which ffmpeg) build/macos/Build/Products/Release/resources/macos/ffmpeg
+          chmod +x build/macos/Build/Products/Release/resources/macos/ffmpeg
+          echo "FFmpeg copied to resources"
+        
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-app-macos
+          path: build/macos/Build/Products/Release/
           retention-days: 7

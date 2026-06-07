@@ -30,33 +30,61 @@ class FfmpegService {
   String _ffmpegPath = 'ffmpeg';
   
   Future<String> _findFfmpegPath() async {
-    // 获取应用运行目录
+    // 获取可执行文件所在目录（打包后应用的实际位置）
+    String exeDir = path.dirname(Platform.resolvedExecutable);
     String appDir = Directory.current.path;
-    developer.log('App directory: $appDir', name: 'FfmpegService');
+    
+    developer.log('Executable directory: $exeDir', name: 'FfmpegService');
+    developer.log('Current working directory: $appDir', name: 'FfmpegService');
+    
+    // 检测当前平台
+    String platform = Platform.operatingSystem;
+    developer.log('Operating system: $platform', name: 'FfmpegService');
+    
+    // 根据平台设置资源目录
+    String resourcesSubdir = platform == 'macos' ? 'macos' : 'windows';
     
     // 1. 检查应用资源目录（构建时打包的 FFmpeg）
+    // 打包后的目录结构: app.exe, resources/windows/ffmpeg.exe
     List<String> possiblePaths = [
+      // macOS 路径
+      path.join(exeDir, 'resources', 'macos', 'ffmpeg'),
+      path.join(exeDir, 'resources', 'macos', 'ffmpeg.exe'),
+      path.join(exeDir, 'ffmpeg'),
+      path.join(appDir, 'resources', 'macos', 'ffmpeg'),
+      // Windows 路径
+      path.join(exeDir, 'resources', 'windows', 'ffmpeg.exe'),
+      path.join(exeDir, 'resources', 'windows', 'ffmpeg.exe'),
+      path.join(exeDir, 'ffmpeg.exe'),
       path.join(appDir, 'resources', 'windows', 'ffmpeg.exe'),
       path.join(appDir, 'ffmpeg.exe'),
-      path.join(path.dirname(Platform.resolvedExecutable), 'resources', 'windows', 'ffmpeg.exe'),
-      path.join(path.dirname(Platform.resolvedExecutable), 'ffmpeg.exe'),
+      // 开发环境路径
+      path.join(appDir, '..', 'resources', resourcesSubdir, 'ffmpeg'),
+      path.join(appDir, '..', 'resources', resourcesSubdir, 'ffmpeg.exe'),
+      path.join(appDir, '..', '..', 'resources', resourcesSubdir, 'ffmpeg'),
+      path.join(appDir, '..', '..', 'resources', resourcesSubdir, 'ffmpeg.exe'),
+      // 相对路径
+      'resources/macos/ffmpeg',
       'resources/windows/ffmpeg.exe',
-      'ffmpeg.exe',
       'ffmpeg',
     ];
     
     for (String p in possiblePaths) {
-      File file = File(p);
-      if (await file.exists()) {
-        _ffmpegPath = p;
-        developer.log('Found FFmpeg at: $p', name: 'FfmpegService');
-        return p;
+      try {
+        File file = File(p);
+        if (await file.exists()) {
+          _ffmpegPath = p;
+          developer.log('Found FFmpeg at: $p', name: 'FfmpegService');
+          return p;
+        }
+      } catch (e) {
+        developer.log('Error checking path $p: $e', name: 'FfmpegService');
       }
     }
     
     // 2. 检查系统 PATH
     try {
-      ProcessResult result = await Process.run('where', ['ffmpeg'], runInShell: true);
+      ProcessResult result = await Process.run('which', ['ffmpeg'], runInShell: true);
       if (result.exitCode == 0 && result.stdout.isNotEmpty) {
         _ffmpegPath = (result.stdout as String).trim().split('\n').first;
         developer.log('Found FFmpeg in PATH: $_ffmpegPath', name: 'FfmpegService');
@@ -67,7 +95,7 @@ class FfmpegService {
     }
     
     // 3. 尝试直接调用（希望在 PATH 中）
-    developer.log('FFmpeg not found in known locations, using system ffmpeg', name: 'FfmpegService');
+    developer.log('FFmpeg not found in known locations, trying system ffmpeg', name: 'FfmpegService');
     return 'ffmpeg';
   }
 
@@ -78,7 +106,8 @@ class FfmpegService {
     
     try {
       String ffmpegPath = await _findFfmpegPath();
-      developer.log('Detecting hardware accelerators using: $ffmpegPath', name: 'FfmpegService');
+      String platform = Platform.operatingSystem;
+      developer.log('Detecting hardware accelerators using: $ffmpegPath on $platform', name: 'FfmpegService');
       
       // 使用 -encoders 而不是 -codecs 来检测编码器
       ProcessResult result = await Process.run(
@@ -89,36 +118,48 @@ class FfmpegService {
       
       if (result.exitCode == 0) {
         String encoders = (result.stdout as String).toLowerCase();
-        developer.log('FFmpeg encoders output (first 500 chars): ${encoders.substring(0, encoders.length > 500 ? 500 : encoders.length)}', name: 'FfmpegService');
         
-        // 检测 NVIDIA NVENC
-        if (encoders.contains('nvenc') || encoders.contains('h264_nvenc') || encoders.contains('hevc_nvenc')) {
-          accelerators.insert(0, HardwareAccelerator(
-            id: 'nvidia',
-            name: 'NVIDIA NVENC',
-            available: true,
-          ));
-          developer.log('Detected NVIDIA NVENC', name: 'FfmpegService');
-        }
+        if (platform == 'macos') {
+          // macOS 硬件加速：VideoToolbox
+          if (encoders.contains('videotoolbox') || encoders.contains('h264_videotoolbox') || encoders.contains('hevc_videotoolbox')) {
+            accelerators.insert(0, HardwareAccelerator(
+              id: 'apple',
+              name: 'Apple VideoToolbox',
+              available: true,
+            ));
+            developer.log('Detected Apple VideoToolbox', name: 'FfmpegService');
+          }
+        } else {
+          // Windows 硬件加速
+          // 检测 NVIDIA NVENC
+          if (encoders.contains('nvenc') || encoders.contains('h264_nvenc') || encoders.contains('hevc_nvenc')) {
+            accelerators.insert(0, HardwareAccelerator(
+              id: 'nvidia',
+              name: 'NVIDIA NVENC',
+              available: true,
+            ));
+            developer.log('Detected NVIDIA NVENC', name: 'FfmpegService');
+          }
 
-        // 检测 AMD VCE/AMF
-        if (encoders.contains('amf') || encoders.contains('h264_amf') || encoders.contains('hevc_amf')) {
-          accelerators.insert(0, HardwareAccelerator(
-            id: 'amd',
-            name: 'AMD VCE',
-            available: true,
-          ));
-          developer.log('Detected AMD VCE', name: 'FfmpegService');
-        }
+          // 检测 AMD VCE/AMF
+          if (encoders.contains('amf') || encoders.contains('h264_amf') || encoders.contains('hevc_amf')) {
+            accelerators.insert(0, HardwareAccelerator(
+              id: 'amd',
+              name: 'AMD VCE',
+              available: true,
+            ));
+            developer.log('Detected AMD VCE', name: 'FfmpegService');
+          }
 
-        // 检测 Intel QSV
-        if (encoders.contains('qsv') || encoders.contains('h264_qsv') || encoders.contains('hevc_qsv')) {
-          accelerators.insert(0, HardwareAccelerator(
-            id: 'intel',
-            name: 'Intel QSV',
-            available: true,
-          ));
-          developer.log('Detected Intel QSV', name: 'FfmpegService');
+          // 检测 Intel QSV
+          if (encoders.contains('qsv') || encoders.contains('h264_qsv') || encoders.contains('hevc_qsv')) {
+            accelerators.insert(0, HardwareAccelerator(
+              id: 'intel',
+              name: 'Intel QSV',
+              available: true,
+            ));
+            developer.log('Detected Intel QSV', name: 'FfmpegService');
+          }
         }
       } else {
         developer.log('FFmpeg encoders command failed with code: ${result.exitCode}', name: 'FfmpegService');
@@ -144,6 +185,19 @@ class FfmpegService {
     String ffmpegPath = await _findFfmpegPath();
     developer.log('Starting conversion with FFmpeg: $ffmpegPath', name: 'FfmpegService');
     
+    // 验证输入文件存在
+    File inputFile = File(inputPath);
+    if (!await inputFile.exists()) {
+      throw Exception('输入文件不存在: $inputPath');
+    }
+    
+    // 确保输出目录存在
+    String outputDir = path.dirname(outputPath);
+    Directory dir = Directory(outputDir);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    
     List<String> args = [
       '-i', inputPath,
       '-y',
@@ -154,7 +208,8 @@ class FfmpegService {
     // 硬件加速
     if (settings.hardwareAcceleration && hardwareDevice != 'cpu') {
       String hwAccel = '';
-      String codec = 'h264';
+      String codec = 'libx264';
+      String platform = Platform.operatingSystem;
       
       switch (hardwareDevice) {
         case 'nvidia':
@@ -169,13 +224,17 @@ class FfmpegService {
           hwAccel = 'qsv';
           codec = 'h264_qsv';
           break;
+        case 'apple':
+          // macOS VideoToolbox
+          codec = 'h264_videotoolbox';
+          break;
       }
       
       if (hwAccel.isNotEmpty) {
         args.addAll(['-hwaccel', hwAccel]);
       }
       args.addAll(['-c:v', codec]);
-      developer.log('Using hardware acceleration: $hardwareDevice, codec: $codec', name: 'FfmpegService');
+      developer.log('Using hardware acceleration: $hardwareDevice on $platform, codec: $codec', name: 'FfmpegService');
     } else {
       // 视频设置
       if (settings.videoBitrate == -1) {
