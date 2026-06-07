@@ -189,7 +189,7 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.bold,
                   color: _selectedFiles.isNotEmpty 
                       ? colorScheme.onPrimary 
-                      : colorScheme.onSurface.withOpacity(0.3),
+                      : colorScheme.onSurface.withValues(alpha: 0.3),
                 ),
               ),
             ),

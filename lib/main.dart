@@ -34,7 +34,6 @@ class FFmpegConverterApp extends StatelessWidget {
           secondary: Colors.grey[700]!,
           surface: Colors.grey[50]!,
         ),
-        fontFamily: 'Roboto',
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -45,7 +44,6 @@ class FFmpegConverterApp extends StatelessWidget {
           secondary: Colors.grey[300]!,
           surface: Colors.grey[900]!,
         ),
-        fontFamily: 'Roboto',
       ),
       themeMode: ThemeMode.system,
       initialRoute: '/',

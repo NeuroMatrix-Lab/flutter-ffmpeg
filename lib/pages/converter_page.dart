@@ -428,7 +428,12 @@ class _ConverterPageState extends State<ConverterPage> {
                 onChanged: (value) {
                   setState(() => _settings.hardwareAcceleration = value);
                 },
-                activeThumbColor: colorScheme.primary,
+                thumbColor: MaterialStateProperty.resolveWith((states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return colorScheme.primary;
+                  }
+                  return null;
+                }),
               ),
             ),
             const SizedBox(height: 20),
