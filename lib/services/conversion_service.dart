@@ -12,20 +12,20 @@ class ConversionService {
     
     return const [
       // 视频格式
-      FormatInfo(format: 'mp4', name: 'MP4 Video', is_video: true),
-      FormatInfo(format: 'avi', name: 'AVI Video', is_video: true),
-      FormatInfo(format: 'mkv', name: 'MKV Video', is_video: true),
-      FormatInfo(format: 'webm', name: 'WebM Video', is_video: true),
-      FormatInfo(format: 'mov', name: 'MOV Video', is_video: true),
-      FormatInfo(format: 'gif', name: 'GIF Animation', is_video: true),
-      FormatInfo(format: 'jpg', name: 'JPEG Image', is_video: true),
-      FormatInfo(format: 'png', name: 'PNG Image', is_video: true),
+      FormatInfo(format: 'mp4', name: 'MP4', isVideo: true),
+      FormatInfo(format: 'avi', name: 'AVI', isVideo: true),
+      FormatInfo(format: 'mkv', name: 'MKV', isVideo: true),
+      FormatInfo(format: 'webm', name: 'WebM', isVideo: true),
+      FormatInfo(format: 'mov', name: 'MOV', isVideo: true),
+      FormatInfo(format: 'gif', name: 'GIF', isVideo: true),
+      FormatInfo(format: 'jpg', name: 'JPEG', isVideo: true),
+      FormatInfo(format: 'png', name: 'PNG', isVideo: true),
       // 音频格式
-      FormatInfo(format: 'mp3', name: 'MP3 Audio', is_video: false),
-      FormatInfo(format: 'wav', name: 'WAV Audio', is_video: false),
-      FormatInfo(format: 'aac', name: 'AAC Audio', is_video: false),
-      FormatInfo(format: 'flac', name: 'FLAC Audio', is_video: false),
-      FormatInfo(format: 'ogg', name: 'OGG Audio', is_video: false),
+      FormatInfo(format: 'mp3', name: 'MP3', isVideo: false),
+      FormatInfo(format: 'wav', name: 'WAV', isVideo: false),
+      FormatInfo(format: 'aac', name: 'AAC', isVideo: false),
+      FormatInfo(format: 'flac', name: 'FLAC', isVideo: false),
+      FormatInfo(format: 'ogg', name: 'OGG', isVideo: false),
     ];
   }
 

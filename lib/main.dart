@@ -27,15 +27,27 @@ class FFmpegConverterApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF1E1E2E),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF7C3AED),
-          secondary: Color(0xFF6366F1),
-          surface: Color(0xFF2D2D3F),
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.light(
+          primary: Colors.black,
+          secondary: Colors.grey[700]!,
+          surface: Colors.grey[50]!,
         ),
         fontFamily: 'Roboto',
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black,
+        colorScheme: ColorScheme.dark(
+          primary: Colors.white,
+          secondary: Colors.grey[300]!,
+          surface: Colors.grey[900]!,
+        ),
+        fontFamily: 'Roboto',
+      ),
+      themeMode: ThemeMode.system,
       initialRoute: '/',
       onGenerateRoute: (settings) {
         switch (settings.name) {

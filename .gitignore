@@ -12,6 +12,11 @@
 .swiftpm/
 migrate_working_dir/
 
+# MinGW
+mingw64/
+mingw32/
+*/mingw*/
+
 # IntelliJ related
 *.iml
 *.ipr

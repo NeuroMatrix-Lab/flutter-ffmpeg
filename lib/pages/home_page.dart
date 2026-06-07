@@ -16,26 +16,32 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E2E),
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2D2D3F),
-        title: const Text(
+        backgroundColor: colorScheme.surface,
+        title: Text(
           'FFmpeg Converter',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: colorScheme.onSurface,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         centerTitle: true,
         elevation: 0,
       ),
       body: Center(
         child: _selectedFiles.isEmpty
-            ? _buildDropZone()
-            : _buildFileList(),
+            ? _buildDropZone(colorScheme)
+            : _buildFileList(colorScheme),
       ),
     );
   }
 
-  Widget _buildDropZone() {
+  Widget _buildDropZone(ColorScheme colorScheme) {
     return DropTarget(
       onDragDone: (details) {
         setState(() {
@@ -60,13 +66,13 @@ class _HomePageState extends State<HomePage> {
             height: 350,
             decoration: BoxDecoration(
               color: _isDragging
-                  ? const Color(0xFF3D3D5C)
-                  : const Color(0xFF2D2D3F),
+                  ? colorScheme.primary.withValues(alpha: 0.1)
+                  : colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: _isDragging
-                    ? const Color(0xFF7C3AED)
-                    : const Color(0xFF4A4A6A),
+                    ? colorScheme.primary
+                    : colorScheme.outline,
                 width: 2,
                 strokeAlign: BorderSide.strokeAlignInside,
               ),
@@ -78,8 +84,8 @@ class _HomePageState extends State<HomePage> {
                   _isDragging ? Icons.file_download : Icons.video_file_outlined,
                   size: 80,
                   color: _isDragging
-                      ? const Color(0xFF7C3AED)
-                      : const Color(0xFF6B7280),
+                      ? colorScheme.primary
+                      : colorScheme.onSurface.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 24),
                 Text(
@@ -89,18 +95,18 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 18,
                     color: _isDragging
-                        ? const Color(0xFF7C3AED)
-                        : const Color(0xFF9CA3AF),
+                        ? colorScheme.primary
+                        : colorScheme.onSurface.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   '支持视频: MP4, AVI, MKV, MOV, WebM\n支持音频: MP3, WAV, AAC, FLAC, OGG',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF6B7280),
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     height: 1.5,
                   ),
                 ),
@@ -112,7 +118,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFileList() {
+  Widget _buildFileList(ColorScheme colorScheme) {
     return Column(
       children: [
         Padding(
@@ -125,8 +131,8 @@ class _HomePageState extends State<HomePage> {
                 icon: const Icon(Icons.add),
                 label: const Text('添加更多文件'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7C3AED),
-                  foregroundColor: Colors.white,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -141,8 +147,8 @@ class _HomePageState extends State<HomePage> {
                 icon: const Icon(Icons.clear_all),
                 label: const Text('清空'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFF6B7280),
-                  side: const BorderSide(color: Color(0xFF4A4A6A)),
+                  foregroundColor: colorScheme.onSurface.withValues(alpha: 0.7),
+                  side: BorderSide(color: colorScheme.outline),
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -158,7 +164,7 @@ class _HomePageState extends State<HomePage> {
             itemCount: _selectedFiles.length,
             itemBuilder: (context, index) {
               final file = _selectedFiles[index];
-              return _buildFileCard(file);
+              return _buildFileCard(file, colorScheme);
             },
           ),
         ),
@@ -170,15 +176,21 @@ class _HomePageState extends State<HomePage> {
             child: ElevatedButton(
               onPressed: _selectedFiles.isNotEmpty ? _navigateToConverter : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF7C3AED),
-                disabledBackgroundColor: const Color(0xFF3D3D5C),
+                backgroundColor: colorScheme.primary,
+                disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 '开始转换',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _selectedFiles.isNotEmpty 
+                      ? colorScheme.onPrimary 
+                      : colorScheme.onSurface.withOpacity(0.3),
+                ),
               ),
             ),
           ),
@@ -187,7 +199,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFileCard(File file) {
+  Widget _buildFileCard(File file, ColorScheme colorScheme) {
     final fileName = file.path.split(Platform.pathSeparator).last;
     final extension = fileName.split('.').last.toUpperCase();
 
@@ -195,9 +207,9 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2D2D3F),
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF4A4A6A)),
+        border: Border.all(color: colorScheme.outline),
       ),
       child: Row(
         children: [
@@ -205,14 +217,14 @@ class _HomePageState extends State<HomePage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withValues(alpha: 0.2),
+              color: colorScheme.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
               child: Text(
                 extension,
-                style: const TextStyle(
-                  color: Color(0xFF7C3AED),
+                style: TextStyle(
+                  color: colorScheme.primary,
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                 ),
@@ -226,8 +238,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   fileName,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colorScheme.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
                   maxLines: 1,
@@ -236,8 +248,8 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 4),
                 Text(
                   _getFileSize(file),
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                  style: TextStyle(
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     fontSize: 12,
                   ),
                 ),
@@ -245,7 +257,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.close, color: Color(0xFF6B7280)),
+            icon: Icon(Icons.close, color: colorScheme.onSurface.withValues(alpha: 0.5)),
             onPressed: () {
               setState(() {
                 _selectedFiles.remove(file);
@@ -307,7 +319,6 @@ class _HomePageState extends State<HomePage> {
       '/converter',
       arguments: _selectedFiles,
     ).then((_) {
-      // 当从转换页面返回时刷新列表
       setState(() {});
     });
   }
