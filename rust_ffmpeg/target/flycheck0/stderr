@@ -1,5 +1,5 @@
-   0.209632300s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rust_ffmpeg", ["lib", "cdylib"], "D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\lib.rs", Edition2021) }
-   0.209723200s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-d0b221eea1f1765f\lib-rust_ffmpeg`
+   0.262308600s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rust_ffmpeg", ["lib", "cdylib"], "D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\lib.rs", Edition2021) }
+   0.262394300s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-d0b221eea1f1765f\lib-rust_ffmpeg`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -51,8 +51,8 @@ Stack backtrace:
   30: mainCRTStartup
   31: <unknown>
   32: <unknown>
-   0.235949700s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.12.0 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint: fingerprint error for flutter_rust_bridge v2.12.0/Check { test: false }/TargetInner { ..: lib_target("flutter_rust_bridge", ["lib"], "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\flutter_rust_bridge-2.12.0\\src\\lib.rs", Edition2021) }
-   0.235983600s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.12.0 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\flutter_rust_bridge-c559ca7756d3e7fa\lib-flutter_rust_bridge`
+   0.517493400s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.12.0 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint: fingerprint error for flutter_rust_bridge v2.12.0/Check { test: false }/TargetInner { ..: lib_target("flutter_rust_bridge", ["lib"], "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\flutter_rust_bridge-2.12.0\\src\\lib.rs", Edition2021) }
+   0.517531000s  INFO prepare_target{force=false package_id=flutter_rust_bridge v2.12.0 target="flutter_rust_bridge"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\flutter_rust_bridge-c559ca7756d3e7fa\lib-flutter_rust_bridge`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -105,8 +105,8 @@ Stack backtrace:
   31: mainCRTStartup
   32: <unknown>
   33: <unknown>
-   0.243093900s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="dart_sys"}: cargo::core::compiler::fingerprint: fingerprint error for dart-sys v4.1.5/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("dart_sys", ["lib"], "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\dart-sys-4.1.5\\src\\lib.rs", Edition2021) }
-   0.243124100s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="dart_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\dart-sys-4f522c4d79b86012\lib-dart_sys`
+   0.620660200s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="dart_sys"}: cargo::core::compiler::fingerprint: fingerprint error for dart-sys v4.1.5/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("dart_sys", ["lib"], "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\dart-sys-4.1.5\\src\\lib.rs", Edition2021) }
+   0.620690500s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="dart_sys"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\dart-sys-4f522c4d79b86012\lib-dart_sys`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -160,8 +160,8 @@ Stack backtrace:
   32: mainCRTStartup
   33: <unknown>
   34: <unknown>
-   0.244033900s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for dart-sys v4.1.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\dart-sys-4.1.5\\build.rs", Edition2021) }
-   0.244051800s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\dart-sys-7c1a3d30969b7265\run-build-script-build-script-build`
+   0.621446400s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="build-script-build"}: cargo::core::compiler::fingerprint: fingerprint error for dart-sys v4.1.5/RunCustomBuild/TargetInner { ..: custom_build_target("build-script-build", "C:\\Users\\music\\.cargo\\registry\\src\\index.crates.io-1949cf8c6b5b557f\\dart-sys-4.1.5\\build.rs", Edition2021) }
+   0.621464600s  INFO prepare_target{force=false package_id=dart-sys v4.1.5 target="build-script-build"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\dart-sys-7c1a3d30969b7265\run-build-script-build-script-build`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -218,8 +218,8 @@ Stack backtrace:
   35: mainCRTStartup
   36: <unknown>
   37: <unknown>
-   0.267363700s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("rust_ffmpeg", ["lib", "cdylib"], "D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\lib.rs", Edition2021) }
-   0.267397800s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-291d495aab313343\test-lib-rust_ffmpeg`
+   0.862903700s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: true }/TargetInner { name_inferred: true, ..: lib_target("rust_ffmpeg", ["lib", "cdylib"], "D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\lib.rs", Edition2021) }
+   0.862936800s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-291d495aab313343\test-lib-rust_ffmpeg`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -271,8 +271,8 @@ Stack backtrace:
   30: mainCRTStartup
   31: <unknown>
   32: <unknown>
-   0.268344900s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: false }/TargetInner { name: "rust_ffmpeg", doc: true, ..: with_path("D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\main.rs", Edition2021) }
-   0.268372700s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-e1384cd21ce42b23\bin-rust_ffmpeg`
+   0.863990200s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: false }/TargetInner { name: "rust_ffmpeg", doc: true, ..: with_path("D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\main.rs", Edition2021) }
+   0.864062900s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-e1384cd21ce42b23\bin-rust_ffmpeg`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)
@@ -324,8 +324,8 @@ Stack backtrace:
   30: mainCRTStartup
   31: <unknown>
   32: <unknown>
-   0.269295800s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: true }/TargetInner { name: "rust_ffmpeg", doc: true, ..: with_path("D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\main.rs", Edition2021) }
-   0.269318500s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-80caea446f77d353\test-bin-rust_ffmpeg`
+   0.864933400s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint: fingerprint error for rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg)/Check { test: true }/TargetInner { name: "rust_ffmpeg", doc: true, ..: with_path("D:\\Project\\flutter-ffmpeg\\rust_ffmpeg\\src\\main.rs", Edition2021) }
+   0.864956200s  INFO prepare_target{force=false package_id=rust_ffmpeg v0.1.0 (D:\Project\flutter-ffmpeg\rust_ffmpeg) target="rust_ffmpeg"}: cargo::core::compiler::fingerprint:     err: failed to read `D:\Project\flutter-ffmpeg\rust_ffmpeg\target\debug\.fingerprint\rust_ffmpeg-80caea446f77d353\test-bin-rust_ffmpeg`
 
 Caused by:
     系统找不到指定的文件。 (os error 2)

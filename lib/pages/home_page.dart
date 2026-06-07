@@ -278,7 +278,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _pickFiles() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: [
         'mp4', 'avi', 'mkv', 'mov', 'webm', 'wmv', 'flv',
