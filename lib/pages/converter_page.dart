@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import 'dart:developer' as developer;
 import 'package:path_provider/path_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import '../models/format_info.dart';
 import '../services/conversion_service.dart';
 
@@ -19,6 +21,7 @@ class _ConverterPageState extends State<ConverterPage> {
   bool _isConverting = false;
   final Map<String, double> _fileProgress = {};
   String _outputPath = '';
+  String _hardwareDevice = 'CPU';
 
   late List<FormatInfo> _supportedFormats;
   late ConversionSettings _settings;
@@ -39,6 +42,18 @@ class _ConverterPageState extends State<ConverterPage> {
       _fileProgress[file.path] = 0.0;
     }
     _generateOutputPath();
+    _detectHardwareDevice();
+  }
+
+  Future<void> _detectHardwareDevice() async {
+    // TODO: 从 Rust FFI 获取实际硬件检测
+    // 目前模拟检测 Windows 上常见的硬件加速设备
+    if (_settings.hardwareAcceleration) {
+      // 模拟检测：优先 NVIDIA，其次 Intel，最后 AMD
+      setState(() {
+        _hardwareDevice = 'NVIDIA NVENC';
+      });
+    }
   }
 
   @override
@@ -80,7 +95,7 @@ class _ConverterPageState extends State<ConverterPage> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: _buildFloatPanel(colorScheme),
     );
   }
@@ -217,6 +232,9 @@ class _ConverterPageState extends State<ConverterPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 硬件设备指示
+            _buildHardwareIndicator(colorScheme),
+            const SizedBox(height: 16),
             Text(
               '输出格式',
               style: TextStyle(
@@ -242,6 +260,47 @@ class _ConverterPageState extends State<ConverterPage> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHardwareIndicator(ColorScheme colorScheme) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: colorScheme.outline),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            _settings.hardwareAcceleration ? Icons.speed : Icons.computer,
+            size: 16,
+            color: _settings.hardwareAcceleration 
+                ? colorScheme.primary 
+                : colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '硬件加速: ',
+            style: TextStyle(
+              color: colorScheme.onSurface.withValues(alpha: 0.7),
+              fontSize: 13,
+            ),
+          ),
+          Text(
+            _settings.hardwareAcceleration ? _hardwareDevice : 'CPU',
+            style: TextStyle(
+              color: _settings.hardwareAcceleration 
+                  ? colorScheme.primary 
+                  : colorScheme.onSurface,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -426,10 +485,17 @@ class _ConverterPageState extends State<ConverterPage> {
               Switch(
                 value: _settings.hardwareAcceleration,
                 onChanged: (value) {
-                  setState(() => _settings.hardwareAcceleration = value);
+                  setState(() {
+                    _settings.hardwareAcceleration = value;
+                    if (value) {
+                      _hardwareDevice = 'NVIDIA NVENC';
+                    } else {
+                      _hardwareDevice = 'CPU';
+                    }
+                  });
                 },
-                thumbColor: MaterialStateProperty.resolveWith((states) {
-                  if (states.contains(MaterialState.selected)) {
+                thumbColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
                     return colorScheme.primary;
                   }
                   return null;
@@ -544,84 +610,75 @@ class _ConverterPageState extends State<ConverterPage> {
 
   Widget _buildFloatPanel(ColorScheme colorScheme) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
         border: Border.all(color: colorScheme.outline),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            flex: 3,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '输出路径',
-                  style: TextStyle(
-                    color: colorScheme.onSurface.withValues(alpha: 0.5),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _outputPath.isNotEmpty ? _outputPath : '未设置',
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontSize: 13,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          Flexible(
+            child: Text(
+              _outputPath.isNotEmpty ? _outputPath : '未设置输出路径',
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 13,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 20),
-          Expanded(
-            flex: 1,
-            child: SizedBox(
-              height: 48,
-              child: ElevatedButton(
-                onPressed: _selectedFormat != null && !_isConverting
-                    ? _startConversion
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: _isConverting
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.onPrimary,
-                          ),
-                        ),
-                      )
-                    : Text(
-                        '开始转换',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
+          const SizedBox(width: 8),
+          IconButton(
+            onPressed: _selectOutputPath,
+            icon: Icon(Icons.folder_open, size: 20),
+            color: colorScheme.onSurface.withValues(alpha: 0.7),
+            tooltip: '选择输出路径',
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            padding: EdgeInsets.zero,
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: _selectedFormat != null && !_isConverting
+                ? _startConversion
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colorScheme.primary,
+              disabledBackgroundColor: colorScheme.onSurface.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
+            child: _isConverting
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        colorScheme.onPrimary,
+                      ),
+                    ),
+                  )
+                : Text(
+                    '开始转换',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: colorScheme.onPrimary,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -640,33 +697,226 @@ class _ConverterPageState extends State<ConverterPage> {
     });
   }
 
+  Future<void> _selectOutputPath() async {
+    final currentFile = widget.files[_selectedFileIndex];
+    final fileName = currentFile.path.split(Platform.pathSeparator).last;
+    final nameWithoutExt = fileName.split('.').first;
+    final outputFormat = _selectedFormat ?? 'mp4';
+
+    String? selectedPath = await FilePicker.saveFile(
+      dialogTitle: '选择输出路径',
+      fileName: '$nameWithoutExt.$outputFormat',
+      type: FileType.custom,
+      allowedExtensions: [outputFormat],
+    );
+
+    if (selectedPath != null) {
+      setState(() {
+        _outputPath = selectedPath;
+      });
+    }
+  }
+
   Future<void> _startConversion() async {
-    if (_selectedFormat == null) return;
+    if (_selectedFormat == null) {
+      developer.log(
+        '转换失败: 未选择输出格式',
+        name: 'ConverterPage',
+        level: 900, // ERROR level
+      );
+      return;
+    }
+
+    final inputFile = widget.files[_selectedFileIndex];
+    final inputPath = inputFile.path;
+    final fileName = inputPath.split(Platform.pathSeparator).last;
+
+    // 记录转换开始前的详细信息
+    developer.log(
+      '========== 开始转换 ==========',
+      name: 'ConverterPage',
+      level: 500, // INFO level
+    );
+    developer.log(
+      '输入文件: $inputPath',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '文件名: $fileName',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '文件大小: ${_getFileSize(inputFile)}',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '输出格式: $_selectedFormat',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '输出路径: $_outputPath',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '硬件加速: ${_settings.hardwareAcceleration ? _hardwareDevice : "CPU"}',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '视频编码器: ${_settings.videoCodec}',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '视频码率: ${_settings.videoBitrate} kbps',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '帧率: ${_settings.framerate} FPS',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '分辨率: ${_settings.resolutionWidth}x${_settings.resolutionHeight}',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '音频编码器: ${_settings.audioCodec}',
+      name: 'ConverterPage',
+    );
+    developer.log(
+      '音频码率: ${_settings.audioBitrate} kbps',
+      name: 'ConverterPage',
+    );
+
+    // 检查输入文件是否存在
+    if (!await inputFile.exists()) {
+      developer.log(
+        '转换失败: 输入文件不存在 - $inputPath',
+        name: 'ConverterPage',
+        level: 900,
+      );
+      _showErrorSnackBar('输入文件不存在');
+      return;
+    }
+
+    // 检查输出路径是否设置
+    if (_outputPath.isEmpty) {
+      developer.log(
+        '转换失败: 输出路径未设置',
+        name: 'ConverterPage',
+        level: 900,
+      );
+      _showErrorSnackBar('请先设置输出路径');
+      return;
+    }
 
     setState(() {
       _isConverting = true;
     });
 
-    for (int i = 0; i <= 100; i += 5) {
-      await Future.delayed(const Duration(milliseconds: 100));
+    developer.log(
+      '开始执行转换任务...',
+      name: 'ConverterPage',
+    );
+
+    try {
+      // TODO: 调用 Rust FFI 执行实际转换
+      // 目前使用模拟进度
+      for (int i = 0; i <= 100; i += 5) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (!mounted) {
+          developer.log(
+            '转换中断: Widget 已卸载',
+            name: 'ConverterPage',
+            level: 800, // WARNING level
+          );
+          return;
+        }
+        setState(() {
+          _fileProgress[inputPath] = i.toDouble();
+        });
+        if (i % 20 == 0) {
+          developer.log(
+            '转换进度: $i%',
+            name: 'ConverterPage',
+          );
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _isConverting = false;
+        _fileProgress[inputPath] = 100.0;
+      });
+
+      developer.log(
+        '========== 转换完成 ==========',
+        name: 'ConverterPage',
+        level: 500,
+      );
+      developer.log(
+        '输出文件: $_outputPath',
+        name: 'ConverterPage',
+      );
+      developer.log(
+        '总耗时: 约 ${(100 * 100 / 1000).toStringAsFixed(1)} 秒 (模拟)',
+        name: 'ConverterPage',
+      );
+
+      if (!mounted) return;
+      final colorScheme = Theme.of(context).colorScheme;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('转换完成!', style: TextStyle(color: colorScheme.onPrimary)),
+          backgroundColor: colorScheme.primary,
+        ),
+      );
+    } catch (e, stackTrace) {
+      developer.log(
+        '========== 转换失败 ==========',
+        name: 'ConverterPage',
+        level: 900,
+      );
+      developer.log(
+        '错误信息: $e',
+        name: 'ConverterPage',
+        level: 900,
+      );
+      developer.log(
+        '堆栈跟踪: $stackTrace',
+        name: 'ConverterPage',
+        level: 900,
+      );
+
       if (!mounted) return;
       setState(() {
-        _fileProgress[widget.files[_selectedFileIndex].path] = i.toDouble();
+        _isConverting = false;
       });
+      _showErrorSnackBar('转换失败: $e');
     }
+  }
 
-    if (!mounted) return;
-    setState(() {
-      _isConverting = false;
-      _fileProgress[widget.files[_selectedFileIndex].path] = 100.0;
-    });
+  String _getFileSize(File file) {
+    try {
+      final bytes = file.lengthSync();
+      if (bytes < 1024) return '$bytes B';
+      if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+      if (bytes < 1024 * 1024 * 1024) {
+        return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+      }
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    } catch (e) {
+      return '未知';
+    }
+  }
 
+  void _showErrorSnackBar(String message) {
     if (!mounted) return;
     final colorScheme = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('转换完成!', style: TextStyle(color: colorScheme.onPrimary)),
-        backgroundColor: colorScheme.primary,
+        content: Text(message, style: TextStyle(color: colorScheme.onError)),
+        backgroundColor: colorScheme.error,
+        duration: const Duration(seconds: 5),
       ),
     );
   }
