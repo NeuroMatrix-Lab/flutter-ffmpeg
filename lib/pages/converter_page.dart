@@ -68,39 +68,18 @@ class _ConverterPageState extends State<ConverterPage> {
     ];
 
     try {
-      // 检测可用的硬件加速器
-      final result = await Process.run(
-        'ffmpeg',
-        ['-hide_banner', '-codecs'],
-        runInShell: true,
-      );
-      final output = result.stdout.toString().toLowerCase();
+      // 使用 FfmpegService 统一检测硬件加速器（-encoders 比 -codecs 更准确）
+      final ffmpegService = FfmpegService();
+      final accelerators = await ffmpegService.detectHardwareAccelerators();
 
-      // 检测 NVIDIA NVENC
-      if (output.contains('nvenc')) {
-        _availableHardwareDevices.insert(0, {
-          'id': 'nvidia',
-          'name': 'NVIDIA NVENC',
-          'icon': 'speed',
-        });
-      }
-
-      // 检测 AMD VCE/AMF
-      if (output.contains('vc_enc') || output.contains('amf')) {
-        _availableHardwareDevices.insert(0, {
-          'id': 'amd',
-          'name': 'AMD VCE',
-          'icon': 'speed',
-        });
-      }
-
-      // 检测 Intel QSV
-      if (output.contains('qsv')) {
-        _availableHardwareDevices.insert(0, {
-          'id': 'intel',
-          'name': 'Intel QSV',
-          'icon': 'speed',
-        });
+      for (var acc in accelerators) {
+        if (acc.id != 'cpu') {
+          _availableHardwareDevices.insert(0, {
+            'id': acc.id,
+            'name': acc.name,
+            'icon': 'speed',
+          });
+        }
       }
     } catch (e) {
       developer.log('检测硬件加速设备失败: $e', name: 'ConverterPage');

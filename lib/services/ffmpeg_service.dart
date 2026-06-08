@@ -30,22 +30,19 @@ class FfmpegService {
   String _ffmpegPath = 'ffmpeg';
   
   Future<String> _findFfmpegPath() async {
-    // 获取可执行文件所在目录（打包后应用的实际位置）
-    String exeDir = path.dirname(Platform.resolvedExecutable);
+    // 获取可执行文件所在目录（打包后应用的实际位置�?    String exeDir = path.dirname(Platform.resolvedExecutable);
     String appDir = Directory.current.path;
     
     developer.log('Executable directory: $exeDir', name: 'FfmpegService');
     developer.log('Current working directory: $appDir', name: 'FfmpegService');
     
-    // 检测当前平台
-    String platform = Platform.operatingSystem;
+    // 检测当前平�?    String platform = Platform.operatingSystem;
     developer.log('Operating system: $platform', name: 'FfmpegService');
     
     // 根据平台设置资源目录
     String resourcesSubdir = platform == 'macos' ? 'macos' : 'windows';
     
-    // 1. 检查应用资源目录（构建时打包的 FFmpeg）
-    // 打包后的目录结构: app.exe, resources/windows/ffmpeg.exe
+    // 1. 检查应用资源目录（构建时打包的 FFmpeg�?    // 打包后的目录结构: app.exe, resources/windows/ffmpeg.exe
     List<String> possiblePaths = [
       // macOS 路径
       path.join(exeDir, 'resources', 'macos', 'ffmpeg'),
@@ -54,12 +51,10 @@ class FfmpegService {
       path.join(appDir, 'resources', 'macos', 'ffmpeg'),
       // Windows 路径
       path.join(exeDir, 'resources', 'windows', 'ffmpeg.exe'),
-      path.join(exeDir, 'resources', 'windows', 'ffmpeg.exe'),
       path.join(exeDir, 'ffmpeg.exe'),
       path.join(appDir, 'resources', 'windows', 'ffmpeg.exe'),
       path.join(appDir, 'ffmpeg.exe'),
-      // 开发环境路径
-      path.join(appDir, '..', 'resources', resourcesSubdir, 'ffmpeg'),
+      // 开发环境路�?      path.join(appDir, '..', 'resources', resourcesSubdir, 'ffmpeg'),
       path.join(appDir, '..', 'resources', resourcesSubdir, 'ffmpeg.exe'),
       path.join(appDir, '..', '..', 'resources', resourcesSubdir, 'ffmpeg'),
       path.join(appDir, '..', '..', 'resources', resourcesSubdir, 'ffmpeg.exe'),
@@ -82,7 +77,7 @@ class FfmpegService {
       }
     }
     
-    // 2. 检查系统 PATH
+    // 2. 检查系�?PATH
     try {
       ProcessResult result = await Process.run('which', ['ffmpeg'], runInShell: true);
       if (result.exitCode == 0 && result.stdout.isNotEmpty) {
@@ -99,6 +94,34 @@ class FfmpegService {
     return 'ffmpeg';
   }
 
+  /// 获取媒体文件总时长（秒），用于计算转换进�?  Future<double> _getDuration(String inputPath) async {
+    String ffmpegPath = await _findFfmpegPath();
+    try {
+      ProcessResult result = await Process.run(
+        ffmpegPath,
+        ['-i', inputPath],
+        runInShell: true,
+      );
+      // FFmpeg 将文件信息输出到 stderr
+      String output = (result.stderr as String);
+      // 解析 "Duration: HH:MM:SS.ms"
+      RegExp durationRegex = RegExp(r'Duration:\s*(\d+):(\d+):(\d+)\.(\d+)');
+      Match? match = durationRegex.firstMatch(output);
+      if (match != null) {
+        int hours = int.parse(match.group(1)!);
+        int minutes = int.parse(match.group(2)!);
+        int seconds = int.parse(match.group(3)!);
+        int centiseconds = int.parse(match.group(4)!);
+        double duration = hours * 3600 + minutes * 60 + seconds + centiseconds / 100.0;
+        developer.log('Detected duration: ${duration}s', name: 'FfmpegService');
+        return duration;
+      }
+    } catch (e) {
+      developer.log('Error detecting duration: $e', name: 'FfmpegService');
+    }
+    return 0;
+  }
+
   Future<List<HardwareAccelerator>> detectHardwareAccelerators() async {
     List<HardwareAccelerator> accelerators = [
       HardwareAccelerator(id: 'cpu', name: 'CPU', available: true),
@@ -109,7 +132,7 @@ class FfmpegService {
       String platform = Platform.operatingSystem;
       developer.log('Detecting hardware accelerators using: $ffmpegPath on $platform', name: 'FfmpegService');
       
-      // 使用 -encoders 而不是 -codecs 来检测编码器
+      // 使用 -encoders 而不�?-codecs 来检测编码器
       ProcessResult result = await Process.run(
         ffmpegPath,
         ['-hide_banner', '-encoders'],
@@ -130,8 +153,7 @@ class FfmpegService {
             developer.log('Detected Apple VideoToolbox', name: 'FfmpegService');
           }
         } else {
-          // Windows 硬件加速
-          // 检测 NVIDIA NVENC
+          // Windows 硬件加�?          // 检�?NVIDIA NVENC
           if (encoders.contains('nvenc') || encoders.contains('h264_nvenc') || encoders.contains('hevc_nvenc')) {
             accelerators.insert(0, HardwareAccelerator(
               id: 'nvidia',
@@ -141,7 +163,7 @@ class FfmpegService {
             developer.log('Detected NVIDIA NVENC', name: 'FfmpegService');
           }
 
-          // 检测 AMD VCE/AMF
+          // 检�?AMD VCE/AMF
           if (encoders.contains('amf') || encoders.contains('h264_amf') || encoders.contains('hevc_amf')) {
             accelerators.insert(0, HardwareAccelerator(
               id: 'amd',
@@ -151,7 +173,7 @@ class FfmpegService {
             developer.log('Detected AMD VCE', name: 'FfmpegService');
           }
 
-          // 检测 Intel QSV
+          // 检�?Intel QSV
           if (encoders.contains('qsv') || encoders.contains('h264_qsv') || encoders.contains('hevc_qsv')) {
             accelerators.insert(0, HardwareAccelerator(
               id: 'intel',
@@ -184,11 +206,14 @@ class FfmpegService {
   ) async {
     String ffmpegPath = await _findFfmpegPath();
     developer.log('Starting conversion with FFmpeg: $ffmpegPath', name: 'FfmpegService');
-    
+
+    // 获取视频总时长用于计算进�?    double totalDuration = await _getDuration(inputPath);
+    developer.log('Total duration: ${totalDuration}s', name: 'FfmpegService');
+
     // 验证输入文件存在
     File inputFile = File(inputPath);
     if (!await inputFile.exists()) {
-      throw Exception('输入文件不存在: $inputPath');
+      throw Exception('输入文件不存�? $inputPath');
     }
     
     // 确保输出目录存在
@@ -205,8 +230,7 @@ class FfmpegService {
       '-nostats',
     ];
 
-    // 硬件加速
-    if (settings.hardwareAcceleration && hardwareDevice != 'cpu') {
+    // 硬件加�?    if (settings.hardwareAcceleration && hardwareDevice != 'cpu') {
       String hwAccel = '';
       String codec = 'libx264';
       String platform = Platform.operatingSystem;
@@ -238,8 +262,7 @@ class FfmpegService {
     } else {
       // 视频设置
       if (settings.videoBitrate == -1) {
-        // 复制视频流
-        args.addAll(['-c:v', 'copy']);
+        // 复制视频�?        args.addAll(['-c:v', 'copy']);
       } else {
         String codec = 'lib${settings.videoCodec}';
         args.addAll(['-c:v', codec]);
@@ -261,8 +284,7 @@ class FfmpegService {
           args.addAll(['-r', '${settings.framerate}']);
         }
         
-        // 分辨率
-        if (settings.resolutionWidth > 0 && settings.resolutionHeight > 0) {
+        // 分辨�?        if (settings.resolutionWidth > 0 && settings.resolutionHeight > 0) {
           args.addAll(['-vf', 'scale=${settings.resolutionWidth}:${settings.resolutionHeight}']);
         }
       }
@@ -294,15 +316,38 @@ class FfmpegService {
     Stream<String> progressStream = process.stdout
         .transform(utf8.decoder)
         .transform(LineSplitter());
-    
+
     progressStream.listen((line) {
-      if (line.startsWith('out_time_ms=')) {
+      // out_time_ms �?out_time_us 都是微秒
+      if (line.startsWith('out_time_ms=') || line.startsWith('out_time_us=')) {
         try {
-          double ms = double.parse(line.split('=').last);
-          double progress = (ms / 1000000.0 / 60.0 * 100).clamp(0, 99);
+          double us = double.parse(line.split('=').last);
+          double currentSeconds = us / 1000000.0;
+          double progress = totalDuration > 0
+              ? (currentSeconds / totalDuration * 100).clamp(0, 99)
+              : 0;
           onProgress(progress);
         } catch (e) {
           developer.log('Error parsing progress: $e', name: 'FfmpegService');
+        }
+      }
+      // out_time 格式: HH:MM:SS.ms
+      if (line.startsWith('out_time=')) {
+        try {
+          String timeStr = line.split('=').last.trim();
+          RegExp timeRegex = RegExp(r'(\d+):(\d+):(\d+)\.(\d+)');
+          Match? match = timeRegex.firstMatch(timeStr);
+          if (match != null && totalDuration > 0) {
+            int hours = int.parse(match.group(1)!);
+            int minutes = int.parse(match.group(2)!);
+            int seconds = int.parse(match.group(3)!);
+            int frac = int.parse(match.group(4)!);
+            double currentSeconds = hours * 3600 + minutes * 60 + seconds + frac / 100.0;
+            double progress = (currentSeconds / totalDuration * 100).clamp(0, 99);
+            onProgress(progress);
+          }
+        } catch (e) {
+          developer.log('Error parsing out_time: $e', name: 'FfmpegService');
         }
       }
     });
